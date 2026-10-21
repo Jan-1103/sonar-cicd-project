@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Calc Demo</title></head>
+<body>
+  <h1>Calculator</h1>
+  <input id="a" type="number" value="6"> <input id="b" type="number" value="3">
+  <select id="op"><option>add</option><option>subtract</option><option>multiply</option><option>divide</option></select>
+  <button id="go">Calculate</button>
+  <p id="out"></p>
+  <script src="app.js"></script>
+  <script>
+    document.getElementById('go').onclick = async () => {
+      const r = await fetch(buildUrl(op.value, a.value, b.value));
+      const d = await r.json();
+      out.textContent = formatResult(d.result);
+    };
+  </script>
+</body>
+</html>

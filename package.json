@@ -1,0 +1,17 @@
+{
+  "name": "devops-sonar-demo",
+  "version": "1.0.0",
+  "description": "Demo app with SonarQube Quality Gate enforced in CI/CD",
+  "main": "src/backend/server.js",
+  "scripts": {
+    "start": "node src/backend/server.js",
+    "test": "jest --coverage"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": ["src/**/*.js"],
+    "coverageReporters": ["lcov", "text"]
+  },
+  "dependencies": { "express": "^4.19.2" },
+  "devDependencies": { "jest": "^29.7.0", "supertest": "^7.0.0" }
+}
