@@ -16,21 +16,23 @@ jobs:
             context: .
           - name: frontend
             context: ./frontend
+    env:
+      IMAGE: devops-${{ matrix.name }}:${{ github.run_number }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Build ${{ matrix.name }} image
-        run: docker build -t devops-${{ matrix.name }}:${{ github.run_number }} ${{ matrix.context }}
+        run: docker build -t $IMAGE ${{ matrix.context }}
 
       - name: Trivy report (HIGH and CRITICAL)
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: devops-${{ matrix.name }}:${{ github.run_number }}
-          scanners: vuln
-          format: table
-          severity: HIGH,CRITICAL
-          output: ${{ matrix.name }}-report.txt
-          exit-code: '0'
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v $PWD:/work \
+            aquasec/trivy:latest image \
+            --scanners vuln --severity HIGH,CRITICAL \
+            --format table --output /work/${{ matrix.name }}-report.txt \
+            $IMAGE
 
       - name: Show report in summary
         if: always()
@@ -48,12 +50,13 @@ jobs:
           path: ${{ matrix.name }}-report.txt
 
       - name: Trivy gate (fail on CRITICAL)
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: devops-${{ matrix.name }}:${{ github.run_number }}
-          scanners: vuln
-          severity: CRITICAL
-          exit-code: '1'
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image \
+            --scanners vuln --severity CRITICAL \
+            --exit-code 1 \
+            $IMAGE
 
   deploy:
     needs: build-and-scan
