@@ -1,1 +1,3 @@
 node_modules/
+jenkins_home_backup.tar.gz
+*.tar.gz
