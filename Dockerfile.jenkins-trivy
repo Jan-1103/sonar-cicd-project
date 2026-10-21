@@ -1,0 +1,5 @@
+FROM jenkins/jenkins:lts-jdk17
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends docker-cli curl ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh -o /tmp/install-trivy.sh && sh /tmp/install-trivy.sh && rm /tmp/install-trivy.sh
+USER jenkins
