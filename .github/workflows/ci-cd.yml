@@ -7,29 +7,36 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest   # self-hosted so it can reach a local SonarQube; use ubuntu-latest if SonarQube is public
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with:
+          node-version: 20
       - run: npm ci
       - run: npm test
       - uses: actions/upload-artifact@v4
-        with: { name: coverage, path: coverage/lcov.info }
+        with:
+          name: coverage
+          path: coverage/lcov.info
 
   sonarqube-analysis:
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
+        with:
+          fetch-depth: 0
       - uses: actions/download-artifact@v4
-        with: { name: coverage, path: coverage }
-      - name: SonarQube scan (waits for Quality Gate; fails the job if gate fails)
-        uses: SonarSource/sonarqube-scan-action@v4
+        with:
+          name: coverage
+          path: coverage
+      
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io   
         with:
           args: >
             -Dsonar.organization=${{ github.repository_owner }}
@@ -37,7 +44,7 @@ jobs:
             -Dsonar.qualitygate.timeout=300
 
   deploy:
-    needs: sonarqube-analysis        # only runs if the Quality Gate passed
+    needs: sonarqube-analysis
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
