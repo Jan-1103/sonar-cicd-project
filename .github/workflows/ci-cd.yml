@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: self-hosted   # self-hosted so it can reach a local SonarQube; use ubuntu-latest if SonarQube is public
+    runs-on: ubuntu-latest   # self-hosted so it can reach a local SonarQube; use ubuntu-latest if SonarQube is public
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -19,7 +19,7 @@ jobs:
 
   sonarqube-analysis:
     needs: build-and-test
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
@@ -38,7 +38,7 @@ jobs:
   deploy:
     needs: sonarqube-analysis        # only runs if the Quality Gate passed
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Build and deploy container
