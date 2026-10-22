@@ -39,7 +39,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.organization=${{ github.repository_owner }}
+            -Dsonar.organization=jan-1103
             -Dsonar.qualitygate.wait=true
             -Dsonar.qualitygate.timeout=300
 
